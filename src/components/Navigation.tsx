@@ -3,10 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { label: "games", href: "/games" },
-  { label: "apps", href: "/apps" },
-  { label: "settings", href: "/settings" },
-  { label: "pr0xy", href: "/pr0xy" },
+  { label: "Games", href: "/games" },
+  { label: "Apps", href: "/apps" },
+  { label: "Pr0xy", href: "/pr0xy" },
+  { label: "Account", href: "/account" },
+  { label: "Settings", href: "/settings" },
+  { label: "Help", href: "/help" },
 ];
 
 export const Navigation = () => {
@@ -25,21 +27,27 @@ export const Navigation = () => {
           </Link>
 
           {/* Navigation Tabs */}
-          <div className="flex items-center gap-1 bg-[hsl(var(--nav-background))] border border-[hsl(var(--nav-border))] rounded-full p-1 backdrop-blur-sm shadow-subtle">
-            {navItems.map((item) => (
-              <Button
-                key={item.label}
-                variant={activeTab === item.label ? "nav-active" : "nav"}
-                size="nav"
-                asChild
-              >
-                <Link to={item.href} className="relative">
-                  {item.label}
-                  {activeTab === item.label && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-full blur-xl -z-10" />
-                  )}
-                </Link>
-              </Button>
+          <div className="flex items-center gap-1 bg-[hsl(var(--nav-background))] border border-[hsl(var(--nav-border))] rounded-full px-2 py-1.5 backdrop-blur-sm shadow-subtle">
+            {navItems.map((item, index) => (
+              <div key={item.label} className="flex items-center">
+                <Button
+                  variant={activeTab === item.label.toLowerCase() ? "nav-active" : "nav"}
+                  size="nav"
+                  asChild
+                >
+                  <Link to={item.href} className="relative">
+                    {item.label}
+                    {activeTab === item.label.toLowerCase() && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-full blur-xl -z-10" />
+                    )}
+                  </Link>
+                </Button>
+                
+                {/* Separator line */}
+                {index < navItems.length - 1 && (
+                  <div className="h-4 w-px bg-border/50 mx-1" />
+                )}
+              </div>
             ))}
           </div>
         </div>

@@ -13,13 +13,18 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="relative text-center space-y-12 animate-fade-in px-6">
-        {/* Big Hideout Text */}
-        <h1 className="text-8xl md:text-9xl font-bold tracking-tight">
-          <span className="text-foreground">Hideout</span>
-          <span className="text-primary">.</span>
-        </h1>
+        {/* Big Hideout Text with Glow */}
+        <div className="relative inline-block">
+          {/* Glowing green background */}
+          <div className="absolute inset-0 bg-primary/30 blur-[100px] animate-glow-pulse scale-150" />
+          
+          <h1 className="text-8xl md:text-9xl font-bold tracking-tight relative">
+            <span className="text-foreground">Hideout</span>
+            <span className="text-primary">.</span>
+          </h1>
+        </div>
 
-        {/* Play Button */}
+        {/* Start Button */}
         <div>
           <Button 
             size="lg" 
@@ -28,7 +33,7 @@ const Index = () => {
           >
             <Link to="/games">
               <Play className="w-6 h-6 fill-current" />
-              Play
+              Start
             </Link>
           </Button>
         </div>
