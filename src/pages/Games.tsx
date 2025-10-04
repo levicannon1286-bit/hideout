@@ -3,8 +3,14 @@ import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Search, Gamepad2, Flame, TrendingUp, Sparkles, Star } from "lucide-react";
+import { Search, Gamepad2, Flame, TrendingUp, Sparkles, Star, Filter } from "lucide-react";
 
 const games = [
   { id: 1, name: "Slope", category: "Action", popularity: "hot" },
@@ -81,63 +87,48 @@ const Games = () => {
             Play unblocked games anywhere, anytime. No restrictions, just fun.
           </p>
 
-          {/* Search */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input 
-              placeholder="Search games..." 
-              className="pl-10 bg-card border-border transition-colors"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+          {/* Search and Filters */}
+          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Input 
+                placeholder="Search games..." 
+                className="pl-10 bg-card border-border transition-colors"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={activeFilter === null ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveFilter(null)}
-              className="transition-colors"
-            >
-              All
-            </Button>
-            <Button
-              variant={activeFilter === "hot" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveFilter("hot")}
-              className="transition-colors"
-            >
-              <Flame className="w-4 h-4 mr-1" />
-              Hot
-            </Button>
-            <Button
-              variant={activeFilter === "popular" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveFilter("popular")}
-              className="transition-colors"
-            >
-              <Star className="w-4 h-4 mr-1" />
-              Popular
-            </Button>
-            <Button
-              variant={activeFilter === "trending" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveFilter("trending")}
-              className="transition-colors"
-            >
-              <TrendingUp className="w-4 h-4 mr-1" />
-              Trending
-            </Button>
-            <Button
-              variant={activeFilter === "new" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveFilter("new")}
-              className="transition-colors"
-            >
-              <Sparkles className="w-4 h-4 mr-1" />
-              New
-            </Button>
+            {/* Filter Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Filter className="w-4 h-4" />
+                  {activeFilter ? activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1) : "All Filters"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-card border-border">
+                <DropdownMenuItem onClick={() => setActiveFilter(null)} className="cursor-pointer">
+                  All Games
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveFilter("hot")} className="cursor-pointer">
+                  <Flame className="w-4 h-4 mr-2 text-red-500" />
+                  Hot
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveFilter("popular")} className="cursor-pointer">
+                  <Star className="w-4 h-4 mr-2 text-yellow-500" />
+                  Popular
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveFilter("trending")} className="cursor-pointer">
+                  <TrendingUp className="w-4 h-4 mr-2 text-blue-500" />
+                  Trending
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveFilter("new")} className="cursor-pointer">
+                  <Sparkles className="w-4 h-4 mr-2 text-green-500" />
+                  New
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -165,8 +156,8 @@ const Games = () => {
               })()}
 
               {/* Game Icon Placeholder */}
-              <div className="aspect-square mb-3 rounded-lg bg-secondary/50 flex items-center justify-center group-hover:bg-primary/5 transition-colors">
-                <Gamepad2 className="w-8 h-8 text-muted-foreground group-hover:text-primary/70 transition-colors" />
+              <div className="aspect-square mb-3 rounded-lg bg-gradient-to-br from-secondary/50 to-secondary/30 flex items-center justify-center group-hover:from-primary/10 group-hover:to-primary/5 transition-all duration-300">
+                <Gamepad2 className="w-10 h-10 text-muted-foreground group-hover:text-primary/70 transition-colors" />
               </div>
 
               {/* Game Info */}
