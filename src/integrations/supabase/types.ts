@@ -14,7 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      favorites: {
+        Row: {
+          created_at: string
+          game_name: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_name: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_name?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          created_at: string
+          id: string
+          last_active: string
+          secret_key_hash: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_active?: string
+          secret_key_hash: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_active?: string
+          secret_key_hash?: string
+          username?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

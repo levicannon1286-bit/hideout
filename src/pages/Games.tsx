@@ -5,14 +5,25 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, TrendingUp, Flame, Star, Sparkles, Filter, Maximize } from "lucide-react";
+import { Search, TrendingUp, Flame, Star, Sparkles, Filter, Maximize, ArrowLeft } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import gamesData from "@/data/games.json";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type Game = {
   name: string;
@@ -46,6 +57,8 @@ const Games = () => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (gameParam) {
@@ -57,6 +70,34 @@ const Games = () => {
       setCurrentGame(null);
     }
   }, [gameParam]);
+
+  useEffect(() => {
+    const checkFavorite = async () => {
+      if (!currentGame) return;
+
+      const storedUser = localStorage.getItem('hideout_user') || sessionStorage.getItem('hideout_user');
+      if (!storedUser) {
+        setIsFavorited(false);
+        return;
+      }
+
+      try {
+        const user = JSON.parse(storedUser);
+        const { data } = await supabase
+          .from('favorites')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('game_name', currentGame.name)
+          .single();
+
+        setIsFavorited(!!data);
+      } catch (error) {
+        setIsFavorited(false);
+      }
+    };
+
+    checkFavorite();
+  }, [currentGame]);
 
   const handleGameClick = (gameName: string) => {
     const gameSlug = gameName.toLowerCase().replace(/\s+/g, '-');
@@ -86,16 +127,61 @@ const Games = () => {
 
   const allCategories = Array.from(new Set(games.flatMap(game => game.categories)));
 
-  const handleFavorite = () => {
-    // Check if user is logged in (placeholder - will implement auth later)
-    const isLoggedIn = false; // TODO: Replace with actual auth check
+  const handleFavorite = async () => {
+    const storedUser = localStorage.getItem('hideout_user') || sessionStorage.getItem('hideout_user');
     
-    if (!isLoggedIn) {
+    if (!storedUser) {
       setShowLoginPrompt(true);
-      setTimeout(() => {
-        window.location.href = "/settings"; // TODO: Replace with actual auth page
-      }, 2000);
+      return;
     }
+
+    if (!currentGame) return;
+
+    try {
+      const user = JSON.parse(storedUser);
+
+      if (isFavorited) {
+        // Remove from favorites
+        const { error } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('game_name', currentGame.name);
+
+        if (error) throw error;
+
+        setIsFavorited(false);
+        toast({
+          title: "Removed from Favorites",
+          description: `${currentGame.name} has been removed from your favorites`,
+        });
+      } else {
+        // Add to favorites
+        const { error } = await supabase
+          .from('favorites')
+          .insert({ user_id: user.id, game_name: currentGame.name });
+
+        if (error) throw error;
+
+        setIsFavorited(true);
+        toast({
+          title: "Added to Favorites",
+          description: `${currentGame.name} has been added to your favorites`,
+        });
+      }
+    } catch (error) {
+      console.error('Error managing favorite:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update favorites",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLoginRedirect = () => {
+    setShowLoginPrompt(false);
+    window.location.href = "/auth";
   };
 
   // If a game is selected, show the game player
@@ -127,12 +213,6 @@ const Games = () => {
             {/* Controls */}
             <div className="w-full bg-card rounded-lg border border-border p-4 flex gap-3">
               <Button
-                onClick={() => setSearchParams({})}
-                variant="outline"
-              >
-                Back to Games
-              </Button>
-              <Button
                 onClick={handleFullscreen}
                 className="gap-2"
               >
@@ -141,20 +221,29 @@ const Games = () => {
               </Button>
               <Button
                 onClick={handleFavorite}
-                variant="outline"
-                className="gap-2"
+                className={`gap-2 ${isFavorited ? 'bg-yellow-500 hover:bg-yellow-600 text-black' : 'bg-yellow-500 hover:bg-yellow-600 text-black'}`}
               >
-                <Star className="w-4 h-4" />
-                Favorite
+                <Star className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`} />
+                {isFavorited ? 'Favorited' : 'Favorite'}
               </Button>
             </div>
 
-            {/* Login Prompt */}
-            {showLoginPrompt && (
-              <div className="w-full bg-destructive/10 border border-destructive rounded-lg p-4 text-center">
-                <p className="text-destructive font-medium">You need to create an account or login to use favorites. Redirecting...</p>
-              </div>
-            )}
+            {/* Login Prompt Dialog */}
+            <AlertDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
+              <AlertDialogContent className="bg-card border-border">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Account Required</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You need to create an account or login to use the favorites feature.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction onClick={handleLoginRedirect}>
+                    Go to Login
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </main>
       </div>
