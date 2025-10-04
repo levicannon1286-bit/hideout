@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Search, TrendingUp, Flame, Star, Sparkles } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,68 +11,49 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Search, Gamepad2, Flame, TrendingUp, Sparkles, Star, Filter } from "lucide-react";
+import { Filter } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import gamesData from "@/data/games.json";
 
-const games = [
-  { id: 1, name: "Slope", category: "Action", popularity: "hot" },
-  { id: 2, name: "Among Us", category: "Multiplayer", popularity: "popular" },
-  { id: 3, name: "1v1.lol", category: "Shooter", popularity: "hot" },
-  { id: 4, name: "Subway Surfers", category: "Runner", popularity: "popular" },
-  { id: 5, name: "Retro Bowl", category: "Sports", popularity: "trending" },
-  { id: 6, name: "Drive Mad", category: "Racing", popularity: "hot" },
-  { id: 7, name: "Monkey Mart", category: "Strategy", popularity: "new" },
-  { id: 8, name: "Cookie Clicker", category: "Idle", popularity: "popular" },
-  { id: 9, name: "Bitlife", category: "Simulation", popularity: "trending" },
-  { id: 10, name: "Crossy Road", category: "Arcade", popularity: "new" },
-  { id: 11, name: "Shell Shockers", category: "Shooter", popularity: "hot" },
-  { id: 12, name: "Tunnel Rush", category: "Action", popularity: "popular" },
-];
+type Game = {
+  id: number;
+  name: string;
+  icon: string;
+  popularity: string[];
+  categories: string[];
+  gameLink: string;
+};
+
+const games: Game[] = gamesData;
 
 const getBadgeConfig = (popularity: string) => {
   switch (popularity) {
     case "hot":
-      return { 
-        variant: "default" as const, 
-        icon: Flame, 
-        className: "bg-red-600 text-white border-red-500 animate-pulse"
-      };
-    case "popular":
-      return { 
-        variant: "secondary" as const, 
-        icon: Star, 
-        className: "bg-yellow-600 text-white border-yellow-500"
-      };
+      return { variant: "default" as const, icon: Flame, className: "bg-primary/20 text-primary border-primary/30" };
     case "trending":
-      return { 
-        variant: "outline" as const, 
-        icon: TrendingUp, 
-        className: "bg-blue-600 text-white border-blue-500"
-      };
+      return { variant: "default" as const, icon: TrendingUp, className: "bg-blue-500/20 text-blue-400 border-blue-500/30" };
+    case "popular":
+      return { variant: "default" as const, icon: Star, className: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" };
     case "new":
-      return { 
-        variant: "secondary" as const, 
-        icon: Sparkles, 
-        className: "bg-green-600 text-white border-green-500"
-      };
+      return { variant: "default" as const, icon: Sparkles, className: "bg-purple-500/20 text-purple-400 border-purple-500/30" };
     default:
-      return { 
-        variant: "secondary" as const, 
-        icon: Star, 
-        className: ""
-      };
+      return { variant: "secondary" as const, icon: Star, className: "" };
   }
 };
 
 const Games = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [popularityFilter, setPopularityFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   const filteredGames = games.filter((game) => {
-    const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      game.category.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = !activeFilter || game.popularity === activeFilter;
-    return matchesSearch && matchesFilter;
+    const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesPopularity = popularityFilter === "all" || game.popularity.includes(popularityFilter);
+    const matchesCategory = categoryFilter === "all" || game.categories.includes(categoryFilter);
+    return matchesSearch && matchesPopularity && matchesCategory;
   });
+
+  const allCategories = Array.from(new Set(games.flatMap(game => game.categories)));
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,15 +62,13 @@ const Games = () => {
       <main className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
         {/* Header */}
         <div className="space-y-6 mb-12 animate-fade-in">
-          <h1 className="text-4xl font-bold text-foreground">
-            Games
-          </h1>
+          <h1 className="text-4xl font-bold text-foreground">Games</h1>
           <p className="text-muted-foreground text-lg max-w-2xl">
-            Play unblocked games anywhere, anytime. No restrictions, just fun.
+            Discover and play amazing games right in your browser. No downloads required.
           </p>
 
           {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl">
+          <div className="flex gap-3 max-w-2xl">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input 
@@ -99,80 +79,101 @@ const Games = () => {
               />
             </div>
 
-            {/* Filter Dropdown */}
+            {/* Popularity Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 bg-card border-border">
                   <Filter className="w-4 h-4" />
-                  {activeFilter ? activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1) : "All Filters"}
+                  {popularityFilter === "all" ? "Popularity" : popularityFilter.charAt(0).toUpperCase() + popularityFilter.slice(1)}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-card border-border">
-                <DropdownMenuItem onClick={() => setActiveFilter(null)} className="cursor-pointer">
-                  All Games
+              <DropdownMenuContent className="bg-card border-border z-50">
+                <DropdownMenuItem onClick={() => setPopularityFilter("all")}>
+                  All
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveFilter("hot")} className="cursor-pointer">
-                  <Flame className="w-4 h-4 mr-2 text-red-500" />
+                <DropdownMenuItem onClick={() => setPopularityFilter("hot")}>
                   Hot
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveFilter("popular")} className="cursor-pointer">
-                  <Star className="w-4 h-4 mr-2 text-yellow-500" />
+                <DropdownMenuItem onClick={() => setPopularityFilter("popular")}>
                   Popular
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveFilter("trending")} className="cursor-pointer">
-                  <TrendingUp className="w-4 h-4 mr-2 text-blue-500" />
+                <DropdownMenuItem onClick={() => setPopularityFilter("trending")}>
                   Trending
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveFilter("new")} className="cursor-pointer">
-                  <Sparkles className="w-4 h-4 mr-2 text-green-500" />
+                <DropdownMenuItem onClick={() => setPopularityFilter("new")}>
                   New
                 </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Category Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2 bg-card border-border">
+                  <Filter className="w-4 h-4" />
+                  {categoryFilter === "all" ? "Category" : categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-card border-border z-50">
+                <DropdownMenuItem onClick={() => setCategoryFilter("all")}>
+                  All
+                </DropdownMenuItem>
+                {allCategories.map((category) => (
+                  <DropdownMenuItem key={category} onClick={() => setCategoryFilter(category)}>
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
 
         {/* Games Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {filteredGames.map((game, index) => (
-            <Card
-              key={game.id}
-              className="group p-4 bg-card border-border hover:border-primary/20 transition-all duration-300 cursor-pointer animate-fade-in relative"
-              style={{ animationDelay: `${index * 30}ms` }}
-            >
-              {/* Popularity Badge */}
-              {game.popularity && (() => {
-                const config = getBadgeConfig(game.popularity);
-                const BadgeIcon = config.icon;
-                return (
-                  <Badge 
-                    variant={config.variant}
-                    className={`absolute top-2 right-2 text-xs uppercase z-10 flex items-center gap-1 pointer-events-none ${config.className}`}
-                  >
-                    <BadgeIcon className="w-3 h-3" />
-                    {game.popularity}
-                  </Badge>
-                );
-              })()}
-
-              {/* Game Icon Placeholder */}
-              <div className="aspect-square mb-3 rounded-lg bg-gradient-to-br from-secondary/50 to-secondary/30 flex items-center justify-center group-hover:from-primary/10 group-hover:to-primary/5 transition-all duration-300">
-                <Gamepad2 className="w-10 h-10 text-muted-foreground group-hover:text-primary/70 transition-colors" />
-              </div>
-
-              {/* Game Info */}
-              <h3 className="text-sm font-semibold mb-1 group-hover:text-primary/80 transition-colors truncate">
-                {game.name}
-              </h3>
-              <p className="text-xs text-muted-foreground truncate">{game.category}</p>
-            </Card>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filteredGames.map((game, index) => {
+            const IconComponent = (LucideIcons as any)[game.icon] || LucideIcons.Gamepad2;
+            return (
+              <Card
+                key={game.id}
+                className="group p-6 bg-gradient-to-br from-card to-card/50 border-border hover:border-primary/20 transition-all duration-300 cursor-pointer animate-fade-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center group-hover:from-primary/25 group-hover:to-primary/15 transition-all">
+                    <IconComponent className="w-8 h-8 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary/90 transition-colors">
+                      {game.name}
+                    </h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {game.popularity.slice(0, 2).map((pop) => {
+                        const config = getBadgeConfig(pop);
+                        const BadgeIcon = config.icon;
+                        return (
+                          <Badge key={pop} variant={config.variant} className={`text-xs ${config.className}`}>
+                            <BadgeIcon className="w-3 h-3 mr-1" />
+                            {pop}
+                          </Badge>
+                        );
+                      })}
+                      {game.categories.slice(0, 2).map((cat) => (
+                        <Badge key={cat} variant="secondary" className="text-xs">
+                          {cat}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
         </div>
 
-        {/* No results message */}
+        {/* No results */}
         {filteredGames.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No games found matching "{searchQuery}"</p>
+            <p className="text-muted-foreground">No games found matching your filters</p>
           </div>
         )}
       </main>

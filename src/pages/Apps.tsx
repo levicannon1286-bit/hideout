@@ -3,16 +3,20 @@ import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, AppWindow, Chrome, Music, Video, MessageSquare, Calculator } from "lucide-react";
+import { Search } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import appsData from "@/data/apps.json";
 
-const apps = [
-  { id: 1, name: "YouTube", category: "Video", icon: Video, description: "Watch videos" },
-  { id: 2, name: "Spotify", category: "Music", icon: Music, description: "Stream music" },
-  { id: 3, name: "Discord", category: "Chat", icon: MessageSquare, description: "Voice & text chat" },
-  { id: 4, name: "Calculator", category: "Utility", icon: Calculator, description: "Basic calculator" },
-  { id: 5, name: "Chrome", category: "Browser", icon: Chrome, description: "Web browser" },
-  { id: 6, name: "Notes", category: "Productivity", icon: AppWindow, description: "Take notes" },
-];
+type App = {
+  id: number;
+  name: string;
+  icon: string;
+  category: string;
+  description: string;
+  link: string;
+};
+
+const apps: App[] = appsData;
 
 const Apps = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +53,7 @@ const Apps = () => {
         {/* Apps Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredApps.map((app, index) => {
-            const IconComponent = app.icon;
+            const IconComponent = (LucideIcons as any)[app.icon] || LucideIcons.AppWindow;
             return (
               <Card
                 key={app.id}

@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "name": "Among Us",
+    "icon": "Users",
+    "popularity": ["hot", "popular"],
+    "categories": ["multiplayer", "action"],
+    "gameLink": "https://example.com/among-us"
+  },
+  {
+    "id": 2,
+    "name": "Minecraft",
+    "icon": "Box",
+    "popularity": ["popular", "trending"],
+    "categories": ["sandbox", "multiplayer"],
+    "gameLink": "https://example.com/minecraft"
+  },
+  {
+    "id": 3,
+    "name": "Call of Duty",
+    "icon": "Crosshair",
+    "popularity": ["hot", "new"],
+    "categories": ["shooter", "multiplayer", "action"],
+    "gameLink": "https://example.com/cod"
+  },
+  {
+    "id": 4,
+    "name": "Fortnite",
+    "icon": "Zap",
+    "popularity": ["popular"],
+    "categories": ["shooter", "multiplayer"],
+    "gameLink": "https://example.com/fortnite"
+  },
+  {
+    "id": 5,
+    "name": "Roblox",
+    "icon": "Layers",
+    "popularity": ["trending", "hot"],
+    "categories": ["sandbox", "multiplayer"],
+    "gameLink": "https://example.com/roblox"
+  },
+  {
+    "id": 6,
+    "name": "Chess",
+    "icon": "Crown",
+    "popularity": ["new"],
+    "categories": ["strategy", "puzzle"],
+    "gameLink": "https://example.com/chess"
+  },
+  {
+    "id": 7,
+    "name": "Subway Surfers",
+    "icon": "Train",
+    "popularity": ["popular"],
+    "categories": ["action", "arcade"],
+    "gameLink": "https://example.com/subway-surfers"
+  },
+  {
+    "id": 8,
+    "name": "Slope",
+    "icon": "Mountain",
+    "popularity": ["hot"],
+    "categories": ["arcade", "action"],
+    "gameLink": "https://example.com/slope"
+  }
+]

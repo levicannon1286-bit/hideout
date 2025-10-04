@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "name": "YouTube",
+    "icon": "Video",
+    "category": "Video",
+    "description": "Watch videos",
+    "link": "https://youtube.com"
+  },
+  {
+    "id": 2,
+    "name": "Spotify",
+    "icon": "Music",
+    "category": "Music",
+    "description": "Stream music",
+    "link": "https://spotify.com"
+  },
+  {
+    "id": 3,
+    "name": "Discord",
+    "icon": "MessageSquare",
+    "category": "Chat",
+    "description": "Voice & text chat",
+    "link": "https://discord.com"
+  },
+  {
+    "id": 4,
+    "name": "Calculator",
+    "icon": "Calculator",
+    "category": "Utility",
+    "description": "Basic calculator",
+    "link": "https://calculator.net"
+  },
+  {
+    "id": 5,
+    "name": "Chrome",
+    "icon": "Chrome",
+    "category": "Browser",
+    "description": "Web browser",
+    "link": "https://google.com/chrome"
+  },
+  {
+    "id": 6,
+    "name": "Notes",
+    "icon": "AppWindow",
+    "category": "Productivity",
+    "description": "Take notes",
+    "link": "https://keep.google.com"
+  },
+  {
+    "id": 7,
+    "name": "Gmail",
+    "icon": "Mail",
+    "category": "Productivity",
+    "description": "Email service",
+    "link": "https://gmail.com"
+  },
+  {
+    "id": 8,
+    "name": "Netflix",
+    "icon": "Tv",
+    "category": "Video",
+    "description": "Stream movies & shows",
+    "link": "https://netflix.com"
+  }
+]
