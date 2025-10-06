@@ -32,8 +32,17 @@ export const GlobalChat = () => {
   }, [isOpen]);
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
+    const storedUser = localStorage.getItem('hideout_user') || sessionStorage.getItem('hideout_user');
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+      } catch (error) {
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
   };
 
   const fetchMessages = async () => {

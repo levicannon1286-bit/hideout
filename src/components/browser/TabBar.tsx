@@ -42,17 +42,18 @@ export const TabBar = ({
   
   const getTabWidth = () => {
     const tabCount = tabs.length;
-    if (tabCount === 1) return "auto";
-    if (tabCount <= 3) return "220px";
-    if (tabCount <= 5) return "180px";
-    if (tabCount <= 7) return "140px";
-    return "100px";
+    if (tabCount === 1) return "220px";
+    if (tabCount === 2) return "220px";
+    if (tabCount === 3) return "220px";
+    if (tabCount === 4) return "220px";
+    if (tabCount === 5) return "220px";
+    return "220px";
   };
 
   return (
     <TooltipProvider>
-      <div className="flex items-center gap-1">
-        <div className="flex items-center gap-1 flex-1 min-w-0">
+      <div className="flex items-center gap-1 justify-between">
+        <div className="flex items-center gap-1 min-w-0">
           {tabs.map((tab, index) => (
             <ContextMenu key={tab.id}>
               <ContextMenuTrigger>
@@ -77,7 +78,7 @@ export const TabBar = ({
                   } 
                 })()}
                 {!tab.pinned && <span className="flex-1 truncate text-sm">{tab.title}</span>}
-                {!tab.pinned && (
+                {!tab.pinned && tabs.length > 1 && (
                   <Button
                     variant="ghost"
                     size="icon"

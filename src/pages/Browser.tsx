@@ -10,6 +10,7 @@ import { BrowserHelp } from "@/components/browser/BrowserHelp";
 import { BrowserSettings } from "@/components/browser/BrowserSettings";
 import { BrowserHistory } from "@/components/browser/BrowserHistory";
 import { supabase } from "@/integrations/supabase/client";
+import { GlobalChat } from "@/components/GlobalChat";
 
 // Browser configuration
 
@@ -657,6 +658,7 @@ const Browser = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <GlobalChat />
     </div>
   );
 };

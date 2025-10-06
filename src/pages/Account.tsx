@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
+import { GlobalChat } from "@/components/GlobalChat";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -89,6 +90,7 @@ const Account = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      <GlobalChat />
       <main className="pt-24 px-4 sm:px-6 pb-12 max-w-2xl mx-auto">
         <Card className="p-8 bg-card border-border">
           <div className="space-y-8">

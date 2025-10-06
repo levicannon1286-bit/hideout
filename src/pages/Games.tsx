@@ -373,29 +373,35 @@ const Games = () => {
                 className="group relative bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 hover:scale-105 transition-all duration-200 cursor-pointer animate-fade-in"
                 style={{ animationDelay: `${index * 20}ms` }}
               >
-                <div className="aspect-square relative overflow-hidden">
+                <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-muted/50 to-muted">
                   <img 
                     src={game.icon} 
                     alt={game.name} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200" 
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
                   />
-                  {badgeInfo && BadgeIcon && (
-                    <div className={`absolute top-2 left-2 ${badgeInfo.className} px-2 py-1 rounded-md flex items-center gap-1 animate-pulse`}>
-                      <BadgeIcon className="w-3 h-3" />
-                      <span className="text-xs font-bold uppercase">{game.popularity[0]}</span>
-                    </div>
-                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div className="p-2">
                   <h3 className="text-sm font-semibold truncate group-hover:text-primary transition-colors">
                     {game.name}
                   </h3>
-                  {game.categories[0] && (
-                    <p className="text-xs text-muted-foreground truncate">
-                      {game.categories[0]}
-                    </p>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {badgeInfo && BadgeIcon && (
+                      <div className={`${badgeInfo.className} px-1.5 py-0.5 rounded flex items-center gap-1 animate-pulse`}>
+                        <BadgeIcon className="w-2.5 h-2.5" />
+                        <span className="text-[10px] font-bold uppercase">{game.popularity[0]}</span>
+                      </div>
+                    )}
+                    {game.categories[0] && (
+                      <p className="text-xs text-muted-foreground truncate flex-1">
+                        {game.categories[0]}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             );

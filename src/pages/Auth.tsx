@@ -53,9 +53,10 @@ const Auth = () => {
       toast({
         title: "Success",
         description: "Logged in successfully!",
+        duration: 5000,
       });
 
-      navigate('/');
+      navigate('/account');
     } catch (error) {
       console.error('Login error:', error);
       toast({

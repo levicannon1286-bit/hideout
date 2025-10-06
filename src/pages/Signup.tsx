@@ -91,9 +91,10 @@ const Signup = () => {
       toast({
         title: "Success",
         description: "Account created successfully!",
+        duration: 5000,
       });
 
-      navigate('/');
+      navigate('/account');
     } catch (error) {
       console.error('Signup error:', error);
       toast({

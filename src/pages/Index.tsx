@@ -2,13 +2,23 @@ import { Navigation } from "@/components/Navigation";
 import { Input } from "@/components/ui/input";
 import { Search, MessageCircle, Mail, FileText, Shield } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ReportBugDialog } from "@/components/ReportBugDialog";
 import { GlobalChat } from "@/components/GlobalChat";
 
 const Index = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('hideout_user') || sessionStorage.getItem('hideout_user');
+    if (storedUser) {
+      const currentPath = window.location.pathname;
+      if (currentPath === '/auth' || currentPath === '/signup') {
+        navigate('/account');
+      }
+    }
+  }, [navigate]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

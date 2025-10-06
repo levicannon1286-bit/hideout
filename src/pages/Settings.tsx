@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
+import { GlobalChat } from "@/components/GlobalChat";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -94,7 +95,7 @@ const Settings = () => {
   const handleSettingChange = (key: keyof SettingsData, value: any) => {
     const newSettings = { ...settings, [key]: value };
     saveSettings(newSettings);
-    toast.success("Setting updated");
+    toast.success("Setting updated", { duration: 5000 });
   };
 
   const handleRequestNotifications = async () => {
@@ -102,9 +103,9 @@ const Settings = () => {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         setSettings(prev => ({ ...prev, notificationsEnabled: true }));
-        toast.success("Notifications enabled!");
+        toast.success("Notifications enabled!", { duration: 5000 });
       } else {
-        toast.error("Notification permission denied");
+        toast.error("Notification permission denied", { duration: 5000 });
       }
     }
   };
@@ -115,10 +116,10 @@ const Settings = () => {
     localStorage.clear();
     
     if (storedUser) {
-      toast.info("Local storage cleared - you have been logged out");
+      toast.info("Local storage cleared - you have been logged out", { duration: 5000 });
       window.location.href = '/';
     } else {
-      toast.success("Local storage cleared successfully!");
+      toast.success("Local storage cleared successfully!", { duration: 5000 });
     }
   };
 
@@ -134,10 +135,10 @@ const Settings = () => {
     });
     
     if (storedUser) {
-      toast.info("Cookies cleared - you have been logged out");
+      toast.info("Cookies cleared - you have been logged out", { duration: 5000 });
       window.location.href = '/';
     } else {
-      toast.success("Cookies cleared successfully!");
+      toast.success("Cookies cleared successfully!", { duration: 5000 });
     }
   };
 
@@ -150,7 +151,7 @@ const Settings = () => {
       generalNotifications: true,
     };
     saveSettings(defaultSettings);
-    toast.success("Settings reset to defaults");
+    toast.success("Settings reset to defaults", { duration: 5000 });
   };
 
   const handleClearCache = () => {
@@ -159,16 +160,17 @@ const Settings = () => {
         names.forEach(name => caches.delete(name));
       });
     }
-    toast.success("Cache cleared successfully!");
+    toast.success("Cache cleared successfully!", { duration: 5000 });
   };
 
   const handleSaveChanges = () => {
-    toast.success("All settings saved successfully!");
+    toast.success("All settings saved successfully!", { duration: 5000 });
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      <GlobalChat />
 
       <main className="pt-24 px-4 sm:px-6 pb-12 max-w-4xl mx-auto">
         {fromBrowser && (
