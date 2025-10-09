@@ -50,7 +50,7 @@ const Help = () => {
           <Card className="p-6 bg-card border-border">
             <Globe className="w-8 h-8 text-primary mb-3" />
             <h3 className="font-semibold mb-2">Browser</h3>
-            <p className="text-sm text-muted-foreground">Access any website with our secure proxy browser. Up to 5 tabs supported!</p>
+            <p className="text-sm text-muted-foreground">Access any website with our secure pr0xy browser. Up to 5 tabs supported!</p>
           </Card>
           <Card className="p-6 bg-card border-border">
             <Zap className="w-8 h-8 text-primary mb-3" />
@@ -92,7 +92,7 @@ const Help = () => {
             <AccordionItem value="item-4">
               <AccordionTrigger>How does the browser feature work?</AccordionTrigger>
               <AccordionContent>
-                The browser feature allows you to access websites through a proxy, 
+                The browser feature allows you to access websites through a pr0xy, 
                 helping you bypass network restrictions while maintaining privacy. You can open up to 5 tabs and navigate just like a regular browser!
               </AccordionContent>
             </AccordionItem>

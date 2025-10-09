@@ -84,9 +84,9 @@ const Terms = () => {
                   <li>Provide the service "as is" without warranties of any kind</li>
                   <li>Are not liable for any damages arising from use of the service</li>
                   <li>Are not responsible for content accessed through the Hideout Browser</li>
-                  <li>Do not guarantee proxy functionality or access to any specific websites</li>
+                  <li>Do not guarantee pr0xy functionality or access to any specific websites</li>
                   <li>Are not liable for any loss of data due to browser clearing, logout, or system reset</li>
-                  <li>Do not guarantee the persistence or security of locally stored data</li>
+                  <li>Sync user data to accounts but do not guarantee 100% data persistence across all scenarios</li>
                 </ul>
               </section>
 

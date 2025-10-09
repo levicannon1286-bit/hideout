@@ -27,11 +27,22 @@ const Apps = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: 0 });
   const [favorites, setFavorites] = useState<string[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
+    setLoadingProgress({ current: 0, total: apps.length });
+    const interval = setInterval(() => {
+      setLoadingProgress(prev => {
+        if (prev.current >= prev.total) {
+          clearInterval(interval);
+          setIsLoading(false);
+          return prev;
+        }
+        return { ...prev, current: prev.current + 1 };
+      });
+    }, 15);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -120,7 +131,9 @@ const Apps = () => {
         <main className="pt-24 px-4 sm:px-6 pb-12 max-w-7xl mx-auto">
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
-            <p className="text-muted-foreground text-lg">Loading apps...</p>
+            <p className="text-muted-foreground text-lg">
+              Loading apps... {loadingProgress.current}/{loadingProgress.total}
+            </p>
           </div>
         </main>
       </div>
@@ -188,9 +201,7 @@ const Apps = () => {
                 style={{ animationDelay: `${index * 20}ms` }}
               >
                 <a
-                  href={app.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={`/browser?url=${encodeURIComponent(app.link)}`}
                   className="block"
                 >
                   <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-muted/50 to-muted">
@@ -220,9 +231,7 @@ const Apps = () => {
                 </a>
                 
                 <a
-                  href={app.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={`/browser?url=${encodeURIComponent(app.link)}`}
                   className="block p-2"
                 >
                   <h3 className="text-sm font-semibold truncate group-hover:text-primary transition-colors">

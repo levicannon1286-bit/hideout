@@ -51,6 +51,7 @@ const Games = () => {
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: 0 });
   const [iconsLoaded, setIconsLoaded] = useState<Record<string, boolean>>({});
   const [favorites, setFavorites] = useState<string[]>([]);
   const { toast } = useToast();
@@ -64,37 +65,45 @@ const Games = () => {
       setIsLoading(false);
     } else {
       setCurrentGame(null);
-      // Preload game icons
+      // Preload game icons with progress
       const loadIcons = async () => {
         setIsLoading(true);
+        setLoadingProgress({ current: 0, total: games.length });
         const loaded: Record<string, boolean> = {};
+        let currentCount = 0;
         
-        await Promise.all(
-          games.map(game => 
-            new Promise<void>((resolve) => {
-              if (!game.icon) {
-                loaded[game.name] = true;
-                resolve();
-                return;
-              }
-              const img = new Image();
-              img.onload = () => {
-                loaded[game.name] = true;
-                resolve();
-              };
-              img.onerror = () => {
-                loaded[game.name] = true;
-                resolve();
-              };
-              img.src = game.icon;
-              // Timeout after 2 seconds
-              setTimeout(() => {
-                loaded[game.name] = true;
-                resolve();
-              }, 2000);
-            })
-          )
-        );
+        for (const game of games) {
+          await new Promise<void>((resolve) => {
+            if (!game.icon) {
+              loaded[game.name] = true;
+              currentCount++;
+              setLoadingProgress({ current: currentCount, total: games.length });
+              resolve();
+              return;
+            }
+            const img = new Image();
+            img.onload = () => {
+              loaded[game.name] = true;
+              currentCount++;
+              setLoadingProgress({ current: currentCount, total: games.length });
+              resolve();
+            };
+            img.onerror = () => {
+              loaded[game.name] = true;
+              currentCount++;
+              setLoadingProgress({ current: currentCount, total: games.length });
+              resolve();
+            };
+            img.src = game.icon;
+            // Timeout after 2 seconds
+            setTimeout(() => {
+              loaded[game.name] = true;
+              currentCount++;
+              setLoadingProgress({ current: currentCount, total: games.length });
+              resolve();
+            }, 2000);
+          });
+        }
         
         setIconsLoaded(loaded);
         setIsLoading(false);
@@ -329,7 +338,9 @@ const Games = () => {
         <main className="pt-24 px-4 sm:px-6 pb-12 max-w-7xl mx-auto">
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
-            <p className="text-muted-foreground text-lg">Loading games...</p>
+            <p className="text-muted-foreground text-lg">
+              Loading games... {loadingProgress.current}/{loadingProgress.total}
+            </p>
           </div>
         </main>
       </div>

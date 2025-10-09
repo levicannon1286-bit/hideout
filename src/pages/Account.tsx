@@ -39,29 +39,45 @@ const Account = () => {
     }
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('hideout_user');
-    sessionStorage.removeItem('hideout_user');
-    toast({
-      title: "Logged Out",
-      description: "Make sure you remember your credentials!",
-    });
-    navigate('/');
+  const handleLogout = async () => {
+    if (!user) return;
+
+    try {
+      // Just clear local/session storage - user still exists in DB
+      localStorage.removeItem('hideout_user');
+      sessionStorage.removeItem('hideout_user');
+      
+      toast({
+        title: "Logged Out",
+        description: "Make sure you remember your credentials!",
+      });
+      
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to logout properly",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDeleteAccount = async () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase
-        .from('profiles')
+      // Delete from users table (this will cascade delete from other tables)
+      const { error } = await (supabase as any)
+        .from('users')
         .delete()
         .eq('id', user.id);
 
       if (error) throw error;
 
-      localStorage.removeItem('hideout_user');
-      sessionStorage.removeItem('hideout_user');
+      // Clear all local data
+      localStorage.clear();
+      sessionStorage.clear();
 
       toast({
         title: "Account Deleted",

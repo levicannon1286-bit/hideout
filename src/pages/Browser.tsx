@@ -11,6 +11,7 @@ import { BrowserSettings } from "@/components/browser/BrowserSettings";
 import { BrowserHistory } from "@/components/browser/BrowserHistory";
 import { supabase } from "@/integrations/supabase/client";
 import { GlobalChat } from "@/components/GlobalChat";
+import { DevTools } from "@/components/DevTools";
 
 // Browser configuration
 
@@ -83,6 +84,7 @@ const Browser = () => {
   const [showMaxTabsDialog, setShowMaxTabsDialog] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [closedTabs, setClosedTabs] = useState<Tab[]>([]);
+  const [showDevTools, setShowDevTools] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const nextTabId = useRef(2);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -138,13 +140,17 @@ const Browser = () => {
     saveToLocalStorage();
   }, [tabs, bookmarks, browserHistory, engine, saveToLocalStorage]);
 
-  // Load initial URL from navigation state
+  // Load initial URL from navigation state or query params
   useEffect(() => {
-    if (initialUrl && activeTab) {
-      setUrlInput(initialUrl);
-      loadUrl(initialUrl, activeTab.id);
+    const urlParam = new URLSearchParams(window.location.search).get('url');
+    const targetUrl = urlParam || initialUrl;
+    
+    if (targetUrl && activeTab && activeTab.url !== targetUrl) {
+      const processedUrl = processUrl(targetUrl);
+      setUrlInput(processedUrl);
+      loadUrl(processedUrl, activeTab.id);
     }
-  }, []);
+  }, [initialUrl]);
 
   const processUrl = (input: string): string => {
     if (!input) return "";
@@ -211,7 +217,7 @@ const Browser = () => {
     setError(null);
 
     try {
-      // Use edge function to proxy the site and return HTML (with auth attached)
+      // Use edge function to pr0xy the site and return HTML (with auth attached)
       const hostname = new URL(url).hostname;
 
       const { data, error } = await supabase.functions.invoke('web-proxy', {
@@ -219,7 +225,7 @@ const Browser = () => {
       });
 
       if (error || !data?.success || !data?.html) {
-        throw new Error((data as any)?.error || error?.message || 'Failed to load page via proxy');
+        throw new Error((data as any)?.error || error?.message || 'Failed to load page via pr0xy');
       }
 
       // Update tab with srcDoc HTML
@@ -476,9 +482,16 @@ const Browser = () => {
     toast.success("All tabs closed");
   };
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts + DevTools toggle
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // F12 or Ctrl+Shift+I for DevTools
+      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+        e.preventDefault();
+        setShowDevTools(prev => !prev);
+        return;
+      }
+
       if (e.altKey) {
         if (e.key === 't') {
           e.preventDefault();
@@ -516,13 +529,21 @@ const Browser = () => {
       }
     };
 
+    const handleDevToolsToggle = () => {
+      setShowDevTools(prev => !prev);
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('hideout:toggle-devtools', handleDevToolsToggle);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('hideout:toggle-devtools', handleDevToolsToggle);
+    };
   }, [activeTab, tabs, activeTabId]);
   
   return (
     <div className="h-screen flex flex-col bg-background">
-      <h1 className="sr-only">Web Proxy Browser</h1>
+      <h1 className="sr-only">Web Pr0xy Browser</h1>
       
       {/* Tab bar with close button */}
       <div className="flex items-center border-b bg-muted/30 px-2 py-1">
@@ -595,7 +616,7 @@ const Browser = () => {
               <p className="text-sm">
                 {error} 
                 <span className="ml-2 text-muted-foreground">
-                  The site may be blocking proxy access or experiencing issues.
+                  The site may be blocking pr0xy access or experiencing issues.
                 </span>
               </p>
               <Button variant="outline" size="sm" onClick={handleReload} className="ml-4">
@@ -649,6 +670,9 @@ const Browser = () => {
           </div>
         )}
       </div>
+
+      {/* DevTools */}
+      {showDevTools && <DevTools onClose={() => setShowDevTools(false)} />}
 
       <AlertDialog open={showMaxTabsDialog} onOpenChange={setShowMaxTabsDialog}>
         <AlertDialogContent>

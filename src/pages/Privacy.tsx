@@ -111,8 +111,9 @@ const Privacy = () => {
                   <li>We are not responsible for third-party privacy practices</li>
                   <li>Review privacy policies of any third-party sites you visit</li>
                   <li>We do not control or endorse third-party content</li>
-                  <li>The Hideout Browser uses a proxy to access external websites - we do not log or monitor your browsing activity</li>
-                  <li>Browser history and bookmarks are stored locally and optionally synced to your account</li>
+                  <li>The Hideout Browser uses a pr0xy to access external websites - we do not log or monitor your browsing activity</li>
+                  <li>Browser history, bookmarks, and settings are stored locally and synced to your account when logged in</li>
+                  <li>All user data (favorites, settings, browser data) is saved to both local storage and your account for persistence</li>
                 </ul>
               </section>
 
