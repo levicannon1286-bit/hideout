@@ -74,34 +74,28 @@ const Games = () => {
         
         for (const game of games) {
           await new Promise<void>((resolve) => {
-            if (!game.icon) {
+            let done = false;
+            const markDone = () => {
+              if (done) return; // prevent double counting
+              done = true;
               loaded[game.name] = true;
-              currentCount++;
+              currentCount = Math.min(currentCount + 1, games.length);
               setLoadingProgress({ current: currentCount, total: games.length });
               resolve();
+            };
+
+            if (!game.icon) {
+              markDone();
               return;
             }
+
             const img = new Image();
-            img.onload = () => {
-              loaded[game.name] = true;
-              currentCount++;
-              setLoadingProgress({ current: currentCount, total: games.length });
-              resolve();
-            };
-            img.onerror = () => {
-              loaded[game.name] = true;
-              currentCount++;
-              setLoadingProgress({ current: currentCount, total: games.length });
-              resolve();
-            };
+            img.onload = markDone;
+            img.onerror = markDone;
             img.src = game.icon;
-            // Timeout after 2 seconds
-            setTimeout(() => {
-              loaded[game.name] = true;
-              currentCount++;
-              setLoadingProgress({ current: currentCount, total: games.length });
-              resolve();
-            }, 2000);
+
+            // Safety timeout after 2 seconds
+            setTimeout(markDone, 2000);
           });
         }
         

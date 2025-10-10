@@ -32,14 +32,15 @@ const Apps = () => {
 
   useEffect(() => {
     setLoadingProgress({ current: 0, total: apps.length });
+    setIsLoading(true);
     const interval = setInterval(() => {
       setLoadingProgress(prev => {
         if (prev.current >= prev.total) {
           clearInterval(interval);
-          setIsLoading(false);
+          setTimeout(() => setIsLoading(false), 300);
           return prev;
         }
-        return { ...prev, current: prev.current + 1 };
+        return { ...prev, current: Math.min(prev.current + 1, prev.total) };
       });
     }, 15);
     return () => clearInterval(interval);

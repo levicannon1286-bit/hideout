@@ -67,13 +67,15 @@ const Account = () => {
     if (!user) return;
 
     try {
-      // Delete from users table (this will cascade delete from other tables)
-      const { error } = await (supabase as any)
-        .from('users')
-        .delete()
-        .eq('id', user.id);
+      // Use secure Edge Function with service role to delete and cascade all data
+      const password = user?.password; // stored from login
+      const { data, error } = await supabase.functions.invoke('delete-account', {
+        body: { userId: user.id, password }
+      });
 
-      if (error) throw error;
+      if (error || (data && (data as any).error)) {
+        throw new Error((data as any)?.error || error?.message || 'Failed to delete account');
+      }
 
       // Clear all local data
       localStorage.clear();
@@ -81,7 +83,7 @@ const Account = () => {
 
       toast({
         title: "Account Deleted",
-        description: "Your account and all game data have been permanently deleted",
+        description: "Your account and all data have been permanently deleted",
       });
 
       navigate('/');
@@ -124,18 +126,12 @@ const Account = () => {
               <div className="p-4 bg-background rounded-lg border border-border">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="text-sm font-medium text-muted-foreground">Password</h3>
-                  <button
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-primary hover:text-primary/80"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
-                <p className="text-xl font-mono text-foreground break-all">
-                  {showPassword ? user.password : '••••••••••••••••'}
+                <p className="text-xl font-mono text-foreground">
+                  ••••••••••••••••
                 </p>
-                <p className="text-xs text-yellow-500 mt-2 flex items-center gap-1">
-                  <span>⚠</span> Keep this safe! If you lose it, you cannot recover your account.
+                <p className="text-xs text-muted-foreground mt-2">
+                  Password is securely encrypted. Use "Change Password" to update.
                 </p>
               </div>
 

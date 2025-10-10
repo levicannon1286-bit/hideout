@@ -94,23 +94,31 @@ const Browser = () => {
   // Sync browser data to Supabase if user is logged in
   const syncToSupabase = useCallback(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
+      // Prefer Hideout account (custom users)
+      const storedUser = localStorage.getItem('hideout_user') || sessionStorage.getItem('hideout_user');
+      let accountId: string | null = null;
+      if (storedUser) {
+        try { accountId = JSON.parse(storedUser)?.id || null; } catch {}
+      }
+
+      if (!accountId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        accountId = user?.id || null;
+      }
+
+      if (accountId) {
         const browserData = {
           tabs: JSON.stringify(tabs),
           bookmarks: JSON.stringify(bookmarks),
           history: JSON.stringify(browserHistory.slice(0, 500)),
           settings: JSON.stringify({ engine }),
-          user_id: user.id,
+          user_id: accountId,
           updated_at: new Date().toISOString()
         };
-        
-        // Store in a browser_data table (will need migration)
-        // For now, store in localStorage with prefix
-        localStorage.setItem(`hideout_browser_data_${user.id}`, JSON.stringify(browserData));
+        localStorage.setItem(`hideout_browser_data_${accountId}`, JSON.stringify(browserData));
       }
     } catch (error) {
-      console.error('Error syncing to Supabase:', error);
+      console.error('Error syncing browser data:', error);
     }
   }, [tabs, bookmarks, browserHistory, engine]);
 
@@ -310,12 +318,38 @@ const Browser = () => {
   };
 
   const handleHome = () => {
-    const homePages = {
-      google: "https://google.com",
-      duckduckgo: "https://duckduckgo.com",
-      bing: "https://bing.com"
-    };
-    const homeUrl = homePages[engine];
+    // Load home page from account-specific settings first, then global settings, then fallback
+    let homeUrl = '';
+    try {
+      const storedUser = localStorage.getItem('hideout_user') || sessionStorage.getItem('hideout_user');
+      let userId: string | null = null;
+      if (storedUser) {
+        try { userId = JSON.parse(storedUser)?.id || null; } catch {}
+      }
+
+      let settings: any = null;
+      if (userId) {
+        const perUser = localStorage.getItem(`hideout_browser_settings_${userId}`);
+        if (perUser) settings = JSON.parse(perUser);
+      }
+      if (!settings) {
+        const saved = localStorage.getItem('hideout_browser_settings');
+        if (saved) settings = JSON.parse(saved);
+      }
+
+      if (settings) {
+        const { homePage, usePreferredBrowser } = settings;
+        if (!usePreferredBrowser && typeof homePage === 'string' && homePage.trim()) {
+          homeUrl = homePage.trim();
+        }
+      }
+    } catch {}
+
+    if (!homeUrl) {
+      const homePages = { google: 'https://google.com', duckduckgo: 'https://duckduckgo.com', bing: 'https://bing.com' } as const;
+      homeUrl = homePages[engine];
+    }
+
     setUrlInput(homeUrl);
     if (activeTab) {
       loadUrl(homeUrl, activeTab.id);

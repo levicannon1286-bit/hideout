@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ReportBugDialog } from "@/components/ReportBugDialog";
 import { GlobalChat } from "@/components/GlobalChat";
+import versionData from "@/data/version.json";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -45,7 +46,12 @@ const Index = () => {
               <span className="text-foreground">Hideout</span>
               <span className="text-primary">.</span>
             </h1>
-            <p className="text-lg text-muted-foreground mt-2">V0.9 Prebeta</p>
+            <Link 
+              to="/changelog" 
+              className="text-lg text-muted-foreground mt-2 hover:text-primary transition-colors inline-block cursor-pointer"
+            >
+              {versionData.version}
+            </Link>
           </div>
 
           {/* Search Bar with Button Inside */}
