@@ -69,13 +69,22 @@ export const ContextMenu = ({ x, y, onClose, isOnBrowser }: ContextMenuProps) =>
     }
   };
 
-  const handleSaveToAccount = () => {
+  const handleSaveToAccount = async () => {
     if (!user) {
       toast.error("Please login to save data to your account");
       return;
     }
-    // The data is already being saved automatically by the browser component
-    toast.success("Data saved to account");
+    
+    try {
+      // Import and use the saveToAccount function
+      const { useUserData } = await import("@/hooks/use-user-data");
+      const { saveToAccount } = useUserData();
+      await saveToAccount();
+      toast.success("All data saved to account");
+    } catch (error) {
+      console.error('Error saving to account:', error);
+      toast.error("Failed to save data to account");
+    }
     onClose();
   };
 

@@ -138,6 +138,9 @@ export const GlobalChat = () => {
                 return updated.slice(-100);
               }
               
+              // Update localStorage cache
+              localStorage.setItem('hideout_chat_messages', JSON.stringify(updated.slice(-100)));
+              
               return updated;
             });
             
@@ -147,7 +150,9 @@ export const GlobalChat = () => {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Chat subscription status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
