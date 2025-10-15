@@ -18,7 +18,6 @@ import Account from "./pages/Account";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Browser from "./pages/Browser";
-import EmailSettings from "./pages/EmailSettings";
 import Changelog from "./pages/Changelog";
 import NotFound from "./pages/NotFound";
 
@@ -61,7 +60,6 @@ const App = () => {
             <Route path="/browser" element={<Browser />} />
             <Route path="/help" element={<Help />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/email-settings" element={<EmailSettings />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/account" element={<Account />} />
