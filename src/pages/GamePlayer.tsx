@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, Navigate } from "react-router-dom";
+import { useSearchParams, Navigate, useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Maximize, Heart } from "lucide-react";
-import gamesData from "@/data/games.json";
+import gamesDataJson from "@/jsons/games.json";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GameLoader } from "@/components/GameLoader";
@@ -13,23 +13,34 @@ import { StarBackground } from "@/components/StarBackground";
 
 type Game = {
   name: string;
-  icon: string;
+  iconPath?: string;
+  icon?: string; // Deprecated - for backward compatibility
   popularity: string[];
   categories: string[];
-  gameLink: string;
+  gamePath?: string;
+  gameLink?: string; // Deprecated - for backward compatibility
 };
 
-const games: Game[] = gamesData;
+type GamesData = {
+  site: string;
+  games: Game[];
+};
+
+const gamesData: GamesData = gamesDataJson as GamesData;
 
 const GamePlayer = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const gameParam = searchParams.get("game");
   const [game, setGame] = useState<Game | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [showLoader, setShowLoader] = useState(true);
+  const [gameLoaded, setGameLoaded] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showFPS, setShowFPS] = useState(false);
+  const games = gamesData.games;
+  const gameSite = gamesData.site;
 
   useEffect(() => {
     const settings = JSON.parse(localStorage.getItem('hideout_settings') || '{}');
@@ -52,15 +63,23 @@ const GamePlayer = () => {
       const foundGame = games.find(
         (g) => g.name.toLowerCase().replace(/\s+/g, '-') === gameParam
       );
+      
+      // Only reset loader if the game actually changed
+      const gameChanged = !game || foundGame?.name !== game.name;
+      
       setGame(foundGame || null);
-      setShowLoader(true);
+      
+      if (gameChanged) {
+        setShowLoader(true);
+        setGameLoaded(false);
+      }
       
       // Check if favorite
       if (foundGame) {
         checkFavoriteStatus(foundGame.name);
       }
     }
-  }, [gameParam, user]);
+  }, [gameParam]);
 
   const checkFavoriteStatus = async (gameName: string) => {
     const localFavorites = JSON.parse(localStorage.getItem('hideout_game_favorites') || '[]');
@@ -143,6 +162,7 @@ const GamePlayer = () => {
 
   const handleLoaderComplete = () => {
     setShowLoader(false);
+    setGameLoaded(true);
   };
 
   // Listen for fullscreen changes
@@ -177,24 +197,44 @@ const GamePlayer = () => {
     <div className="min-h-screen bg-background relative">
       <StarBackground />
       <BatteryWarning isGamePage={true} />
-      <Navigation />
+      <div className="absolute top-0 left-0 right-0 z-50">
+        <Navigation />
+      </div>
       <main className="pt-24 px-6 pb-12 max-w-7xl mx-auto relative z-10">
-        {showLoader && game && (
+        {showLoader && game && !gameLoaded && (
           <GameLoader
             gameName={game.name}
-            gameImage={game.icon}
+            gameImage={game.iconPath ? `${gameSite}${game.iconPath}` : game.icon || ''}
             onLoadComplete={handleLoaderComplete}
           />
         )}
         
         <div className="space-y-6">
-          <h1 className="text-4xl font-bold text-foreground">{game.name}</h1>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/games')}
+              className="gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m12 19-7-7 7-7"/>
+                <path d="M19 12H5"/>
+              </svg>
+              Back to Games
+            </Button>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <img src={game.iconPath ? `${gameSite}${game.iconPath}` : game.icon || ''} alt={game.name} className="w-12 h-12 rounded-lg" />
+            <h1 className="text-4xl font-bold text-foreground">{game.name}</h1>
+          </div>
           
           <div className="w-full aspect-video bg-card rounded-lg overflow-hidden border border-border relative">
             {showFPS && <FPSCounter />}
             <iframe
               id="game-iframe"
-              src={game.gameLink}
+              src={game.gamePath ? `${gameSite}${game.gamePath}` : game.gameLink || ''}
               className="w-full h-full"
               title={game.name}
               allowFullScreen
@@ -205,7 +245,7 @@ const GamePlayer = () => {
             <Button
               onClick={handleFullscreen}
               disabled={showLoader}
-              className="gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 hover:shadow-lg"
               size="lg"
             >
               <Maximize className="w-5 h-5" />
@@ -214,7 +254,7 @@ const GamePlayer = () => {
             <Button
               onClick={toggleFavorite}
               variant={isFavorite ? "default" : "outline"}
-              className="gap-2"
+              className="gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg"
               size="lg"
             >
               <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />

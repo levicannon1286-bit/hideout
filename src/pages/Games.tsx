@@ -17,19 +17,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import gamesData from "@/data/games.json";
+import gamesDataJson from "@/jsons/games.json";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 type Game = {
   name: string;
-  icon: string;
+  iconPath?: string;
+  icon?: string; // Deprecated - for backward compatibility
   popularity: string[];
   categories: string[];
-  gameLink: string;
+  gamePath?: string;
+  gameLink?: string; // Deprecated - for backward compatibility
 };
 
-const games: Game[] = gamesData;
+type GamesData = {
+  site: string;
+  games: Game[];
+};
+
+const gamesData: GamesData = gamesDataJson as GamesData;
 
 const getBadgeConfig = (popularity: string) => {
   switch (popularity) {
@@ -47,6 +54,8 @@ const getBadgeConfig = (popularity: string) => {
 };
 
 const Games = () => {
+  const games = gamesData.games;
+  const gameSite = gamesData.site;
   const [searchParams, setSearchParams] = useSearchParams();
   const gameParam = searchParams.get("game");
   const currentGameName = gameParam ? games.find(g => g.name.toLowerCase().replace(/\s+/g, '-') === gameParam)?.name : null;
@@ -86,7 +95,7 @@ const Games = () => {
       const loadIcons = async () => {
         setIsLoading(true);
         const loaded: Record<string, boolean> = {};
-        games.forEach((game) => { if (game.icon) loaded[game.name] = true; });
+        games.forEach((game) => { if (game.iconPath || game.icon) loaded[game.name] = true; });
         setIconsLoaded(loaded);
         setIsLoading(false);
       };
@@ -272,7 +281,7 @@ const Games = () => {
             {/* Game Title with Icon */}
             <div className="w-full bg-card rounded-lg border border-border p-4 flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                <img src={currentGame.icon} alt={currentGame.name} className="w-full h-full object-cover" />
+                <img src={currentGame.iconPath ? `${gameSite}${currentGame.iconPath}` : currentGame.icon || ''} alt={currentGame.name} className="w-full h-full object-cover" />
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{currentGame.name}</h1>
             </div>
@@ -282,13 +291,13 @@ const Games = () => {
               {showGameLoader && (
                 <GameLoader
                   gameName={currentGame.name}
-                  gameImage={currentGame.icon}
+                  gameImage={currentGame.iconPath ? `${gameSite}${currentGame.iconPath}` : currentGame.icon || ''}
                   onLoadComplete={() => setShowGameLoader(false)}
                 />
               )}
               <iframe
                 id="game-iframe"
-                src={currentGame.gameLink}
+                src={currentGame.gamePath ? `${gameSite}${currentGame.gamePath}` : currentGame.gameLink || ''}
                 className="w-full h-full"
                 title={currentGame.name}
                 allowFullScreen
@@ -417,7 +426,7 @@ const Games = () => {
                   className="aspect-square relative overflow-hidden bg-gradient-to-br from-muted/50 to-muted"
                 >
                   <img 
-                    src={game.icon} 
+                    src={game.iconPath ? `${gameSite}${game.iconPath}` : game.icon || ''} 
                     alt={game.name} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200" 
                     onError={(e) => {

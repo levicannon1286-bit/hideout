@@ -34,6 +34,21 @@ const Browser = () => {
   const initialUrl = (location.state as { initialUrl?: string })?.initialUrl;
   
   const [tabs, setTabs] = useState<Tab[]>(() => {
+    // Check if incognito mode is enabled
+    const savedSettings = localStorage.getItem('hideout_settings');
+    let incognitoEnabled = false;
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        incognitoEnabled = settings.incognitoMode || false;
+      } catch {}
+    }
+
+    // Don't load saved tabs in incognito mode
+    if (incognitoEnabled) {
+      return [{ id: 1, title: "New Tab", url: "", proxiedUrl: "", history: [], historyIndex: -1 }];
+    }
+
     const saved = localStorage.getItem('hideout_browser_tabs');
     if (saved) {
       try {
@@ -75,10 +90,36 @@ const Browser = () => {
   
   const [loading, setLoading] = useState(false);
   const [bookmarks, setBookmarks] = useState<string[]>(() => {
+    // Check if incognito mode is enabled
+    const savedSettings = localStorage.getItem('hideout_settings');
+    let incognitoEnabled = false;
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        incognitoEnabled = settings.incognitoMode || false;
+      } catch {}
+    }
+
+    // Don't load saved bookmarks in incognito mode
+    if (incognitoEnabled) return [];
+
     const saved = localStorage.getItem('hideout_browser_bookmarks');
     return saved ? JSON.parse(saved) : [];
   });
   const [browserHistory, setBrowserHistory] = useState<{url: string, title: string, timestamp: number}[]>(() => {
+    // Check if incognito mode is enabled
+    const savedSettings = localStorage.getItem('hideout_settings');
+    let incognitoEnabled = false;
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        incognitoEnabled = settings.incognitoMode || false;
+      } catch {}
+    }
+
+    // Don't load saved history in incognito mode
+    if (incognitoEnabled) return [];
+
     const saved = localStorage.getItem('hideout_browser_history');
     return saved ? JSON.parse(saved) : [];
   });
@@ -95,6 +136,21 @@ const Browser = () => {
 
   // Sync browser data to Supabase if user is logged in
   const syncToSupabase = useCallback(async () => {
+    // Check if incognito mode is enabled
+    const savedSettings = localStorage.getItem('hideout_settings');
+    let incognitoEnabled = false;
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        incognitoEnabled = settings.incognitoMode || false;
+      } catch {}
+    }
+
+    // Don't sync or save anything in incognito mode
+    if (incognitoEnabled) {
+      return;
+    }
+
     try {
       // Prefer Hideout account (custom users)
       const storedUser = localStorage.getItem('hideout_user') || sessionStorage.getItem('hideout_user');
@@ -126,6 +182,21 @@ const Browser = () => {
 
   // Debounced save to localStorage and Supabase
   const saveToLocalStorage = useCallback(() => {
+    // Check if incognito mode is enabled
+    const savedSettings = localStorage.getItem('hideout_settings');
+    let incognitoEnabled = false;
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        incognitoEnabled = settings.incognitoMode || false;
+      } catch {}
+    }
+
+    // Don't save anything in incognito mode
+    if (incognitoEnabled) {
+      return;
+    }
+
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
@@ -314,12 +385,23 @@ const Browser = () => {
         return tab;
       }));
 
-      // Add to browser history (no duplicates)
-      setBrowserHistory(prev => {
-        const existing = prev.find(h => h.url === url);
-        if (existing) return prev;
-        return [{ url, title: hostname, timestamp: Date.now() }, ...prev.slice(0, 499)];
-      });
+      // Add to browser history (no duplicates) - only if not in incognito mode
+      const savedSettings = localStorage.getItem('hideout_settings');
+      let incognitoEnabled = false;
+      if (savedSettings) {
+        try {
+          const settings = JSON.parse(savedSettings);
+          incognitoEnabled = settings.incognitoMode || false;
+        } catch {}
+      }
+
+      if (!incognitoEnabled) {
+        setBrowserHistory(prev => {
+          const existing = prev.find(h => h.url === url);
+          if (existing) return prev;
+          return [{ url, title: hostname, timestamp: Date.now() }, ...prev.slice(0, 499)];
+        });
+      }
 
       setLoading(false);
       setError(null);

@@ -1,6 +1,8 @@
 import { Navigation } from "@/components/Navigation";
 import { Input } from "@/components/ui/input";
-import { Search, MessageCircle, Mail, FileText, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+import { SiGithub, SiDiscord } from "react-icons/si";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ReportBugDialog } from "@/components/ReportBugDialog";
@@ -8,22 +10,18 @@ import { RequestGameDialog } from "@/components/RequestGameDialog";
 import { GlobalChat } from "@/components/GlobalChat";
 import { StarBackground } from "@/components/StarBackground";
 import { usePageTitle } from "@/hooks/use-page-title";
-import versionData from "@/data/version.json";
+import updatesData from "@/jsons/updates.json";
+import informationData from "@/jsons/information.json";
 
 const Index = () => {
   usePageTitle('Home');
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Get latest version from updates
+  const latestUpdate = updatesData[0];
+  const currentVersion = latestUpdate?.version || "V2 Prebeta";
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('hideout_user') || sessionStorage.getItem('hideout_user');
-    if (storedUser) {
-      const currentPath = window.location.pathname;
-      if (currentPath === '/auth' || currentPath === '/signup') {
-        navigate('/account');
-      }
-    }
-  }, [navigate]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +53,7 @@ const Index = () => {
               to="/changelog" 
               className="text-lg text-muted-foreground mt-2 hover:text-primary transition-colors inline-block cursor-pointer"
             >
-              {versionData.version}
+              {currentVersion}
             </Link>
           </div>
 
@@ -79,43 +77,27 @@ const Index = () => {
           {/* Action Buttons */}
           <div className="flex justify-center gap-3">
             <ReportBugDialog />
-            <RequestGameDialog />
+            <RequestGameDialog variant="outline" />
+            <Button
+              onClick={() => window.open(informationData.github, "_blank")}
+              variant="outline"
+              className="gap-2"
+            >
+              <SiGithub className="w-4 h-4" />
+              GitHub
+            </Button>
+            <Button
+              onClick={() => window.open("https://discord.gg/HkbVraQH89", "_blank")}
+              variant="outline"
+              className="gap-2"
+            >
+              <SiDiscord className="w-4 h-4" />
+              Discord
+            </Button>
           </div>
 
           {/* Footer */}
           <footer className="mt-24 text-center space-y-4 text-sm text-muted-foreground">
-            <div className="flex justify-center gap-6 flex-wrap">
-              <a 
-                href="https://discord.gg/HkbVraQH89" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-primary transition-colors"
-              >
-                <MessageCircle className="w-4 h-4" />
-                Discord Server
-              </a>
-              <a 
-                href="mailto:hideout-network-buisness@hotmail.com"
-                className="flex items-center gap-2 hover:text-primary transition-colors"
-              >
-                <Mail className="w-4 h-4" />
-                Support
-              </a>
-              <Link 
-                to="/terms"
-                className="flex items-center gap-2 hover:text-primary transition-colors"
-              >
-                <FileText className="w-4 h-4" />
-                Terms of Service
-              </Link>
-              <Link 
-                to="/privacy"
-                className="flex items-center gap-2 hover:text-primary transition-colors"
-              >
-                <Shield className="w-4 h-4" />
-                Privacy Policy
-              </Link>
-            </div>
             <p>&copy; {new Date().getFullYear()} Hideout Network. All rights reserved.</p>
           </footer>
         </main>

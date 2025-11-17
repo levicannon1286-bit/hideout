@@ -59,7 +59,7 @@ const Help = () => {
           <Card className="p-6 bg-card border-border">
             <Zap className="w-8 h-8 text-primary mb-3" />
             <h3 className="font-semibold mb-2">Games & Apps</h3>
-            <p className="text-sm text-muted-foreground">Play unblocked games and use apps directly in your browser.</p>
+            <p className="text-sm text-muted-foreground">Play unbl0cked games and use apps directly in your browser.</p>
           </Card>
           <Card className="p-6 bg-card border-border">
             <Shield className="w-8 h-8 text-primary mb-3" />

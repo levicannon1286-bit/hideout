@@ -4,6 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { Input } from "@/components/ui/input";
 import { Search, Filter, Heart, Shuffle } from "lucide-react";
 import { GlobalChat } from "@/components/GlobalChat";
+import { RequestAppDialog } from "@/components/RequestAppDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { StarBackground } from "@/components/StarBackground";
@@ -14,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import appsData from "@/data/apps.json";
+import appsData from "@/jsons/apps.json";
 
 type App = {
   name: string;
@@ -38,7 +39,6 @@ const Apps = () => {
     const loadFavorites = async () => {
       const storedUser = localStorage.getItem('hideout_user') || sessionStorage.getItem('hideout_user');
       if (!storedUser) {
-        // Load from localStorage if not logged in
         const localFavs = JSON.parse(localStorage.getItem('hideout_app_favorites') || '[]');
         setFavorites(localFavs);
         setIsLoading(false);
@@ -58,7 +58,6 @@ const Apps = () => {
           setFavorites(data.data);
           localStorage.setItem('hideout_app_favorites', JSON.stringify(data.data));
         } else {
-          // Load from localStorage if no database data
           const localFavs = JSON.parse(localStorage.getItem('hideout_app_favorites') || '[]');
           setFavorites(localFavs);
         }
@@ -70,8 +69,7 @@ const Apps = () => {
       }
     };
 
-    // Show a very short loading state even if not logged in for visual consistency
-    const timer = setTimeout(() => setIsLoading(false), 350);
+    const timer = setTimeout(() => setIsLoading(false), 2000);
     loadFavorites();
     return () => clearTimeout(timer);
   }, []);
@@ -199,12 +197,14 @@ const Apps = () => {
               <Shuffle className="w-4 h-4" />
               Feeling Lucky
             </Button>
+
+            
           </div>
         </div>
 
         {/* Apps Grid - Poki style */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-          {filteredApps.map((app, index) => {
+        {filteredApps.map((app, index) => {
             const isFav = favorites.includes(app.name);
             
             return (
