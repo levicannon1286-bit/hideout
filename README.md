@@ -1,6 +1,6 @@
 # Hideout
 
-An open-source unblocked gaming platform with 200+ games, proxy browser, and global chat.
+An open-source unblocked gaming platform with 900+ games, proxy browser, and global chat.
 
 ## Quick Start
 
