@@ -1,7 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Dog } from "lucide-react";
 import { SiGithub, SiDiscord } from "react-icons/si";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -97,8 +97,17 @@ const Index = () => {
           </div>
 
           {/* Footer */}
-          <footer className="mt-24 text-center space-y-4 text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} Hideout Network. All rights reserved.</p>
+          <footer className="mt-24 text-center text-sm text-muted-foreground">
+            <p className="flex items-center justify-center gap-2">
+              &copy; {new Date().getFullYear()} Hideout Network. All rights reserved.
+              <span>•</span>
+              <Link 
+                to="/privacy-policy" 
+                className="hover:text-primary transition-colors"
+              >
+                Privacy Policy
+              </Link>
+            </p>
           </footer>
         </main>
       </div>
