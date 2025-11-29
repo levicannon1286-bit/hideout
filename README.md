@@ -1,6 +1,6 @@
 # Hideout
 
-An open-source unblocked gaming platform with 1000+ games, proxy browser, global chat, and more.
+An open-source unblocked gaming platform with 200+ games, proxy browser, and global chat.
 
 ## Quick Start
 
@@ -28,4 +28,4 @@ Add games, themes, or addons at [hideout-assets](https://github.com/Hideout-Netw
 
 ## License
 
-GNU GENERAL PUBLIC © 2025 Hideout Network
+MIT © 2025 Hideout Network
