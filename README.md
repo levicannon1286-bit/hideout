@@ -42,4 +42,4 @@ Add games, themes, or addons at [hideout-assets](https://github.com/Hideout-Netw
 
 ## License
 
-MIT © 2025 Hideout Network
+GNU GENERAL PUBLIC © 2025 Hideout Network
