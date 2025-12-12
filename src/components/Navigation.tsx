@@ -28,7 +28,7 @@ export const Navigation = () => {
           <div className="bg-card/50 backdrop-blur-md rounded-full px-6 py-3 border border-border/50">
             <Link to="/" className="flex items-center group">
               <span className="text-2xl font-bold text-foreground group-hover:text-primary/80 transition-colors">
-                Hideout<span className="text-primary">.</span>
+                Hideout by levi cannon elementry room 19<span className="text-primary">.</span>
               </span>
             </Link>
           </div>
